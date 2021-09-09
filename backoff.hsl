@@ -1,0 +1,64 @@
+function enable_backoff($arguments, $message, $fields = []) {
+    // Filter out policies to enable based on optional $fields parameter
+    $policies = $arguments["policy"]["policies"];
+    if (length($fields) > 0) {
+        $policies = array_filter(function ($policy) closure($fields) {
+            $match = true;
+            if (length($policy["fields"]) === length($fields)) {
+                foreach ($fields as $field) {
+                    if (!array_includes($field, $policy["fields"])) {
+                        $match = false;
+                        break;
+                    }
+                }
+            } else {
+                $match = false;
+            }
+            return $match;
+        }, $policies);
+    }
+
+    // Store field values in an easier to use format
+    $values = [
+        "localip" => $arguments["attempt"]["connection"]["localip"],
+        "remoteip" => $arguments["attempt"]["connection"]["remoteip"],
+        "remotemx" => $arguments["attempt"]["connection"]["remotemx"],
+        "recipientdomain" => $message["recipientaddress"]["domain"],
+        "jobid" => $message["jobid"],
+        "transportid" => $message["transportid"]
+    ];
+
+    // Go through all filtered policies and enable them
+    foreach ($policies as $policy) {
+        // Skip policies that already have backoff enabled
+        if (isset($policy["tags"]) and array_includes("backoff", $policy["tags"])) {
+            continue;
+        }
+
+        // Set all field values in condition
+        $condition = [];
+        foreach ($policy["fields"] as $field) {
+            $condition[$field] = $values[$field];
+        }
+
+        // Get values from properties
+        $backoff = [];
+        $properties = $policy["properties"];
+        if ($properties["backoff-rate"]) {
+            if ($properties["backoff-rate"] =~ #/\//) {
+                $backoff["rate"] = str_split($properties["backoff-rate"], "/");
+            } else {
+                $backoff["rate"] = [$properties["backoff-rate"], 1];
+            }
+        }
+        if ($properties["backoff-concurrency"]) {
+            $backoff["concurrency"] = $properties["backoff-concurrency"];
+        }
+
+        // Enable policy if backoff values were found
+        if (length($backoff) > 0 and $properties["backoff-ttl"]) {
+            $backoff["tag"] = "backoff"; // Set backoff tag
+            queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => false]);
+        }
+    }
+}
