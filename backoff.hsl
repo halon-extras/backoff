@@ -1,22 +1,6 @@
 function enable_backoff($arguments, $message, $fields = []) {
-    // Filter out policies to enable based on optional $fields parameter
-    $policies = $arguments["policy"]["policies"];
-    if (length($fields) > 0) {
-        $policies = array_filter(function ($policy) closure($fields) {
-            $match = true;
-            if (length($policy["fields"]) === length($fields)) {
-                foreach ($fields as $field) {
-                    if (!array_includes($field, $policy["fields"])) {
-                        $match = false;
-                        break;
-                    }
-                }
-            } else {
-                $match = false;
-            }
-            return $match;
-        }, $policies);
-    }
+    // Filter policies to enable based on optional $fields parameter
+    $policies = filter_policies($arguments["policy"]["policies"], $fields);
 
     // Store field values in an easier to use format
     $values = [
@@ -61,4 +45,43 @@ function enable_backoff($arguments, $message, $fields = []) {
             queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => false]);
         }
     }
+}
+
+function disable_backoff($arguments, $message, $fields = []) {
+    // Filter policies to disable based on optional $fields parameter
+    $policies = filter_policies($arguments["policy"]["policies"], $fields);
+    foreach ($policies as $policy) {
+        $properties = $policy["properties"];
+        $disableable = isset($properties["backoff-disableable"]) and str_lower($properties["backoff-disableable"]) === "true" ? true : false;
+        // Check if policy is allowed to be disabled
+        if ($disableable === true) {
+            if (isset($policy["dynamic"])) {
+                foreach ($policy["dynamic"] as $dynamic) {
+                    if ($dynamic["tag"] === "backoff") {
+                        queue_policy_delete($dynamic["id"]); // Disable backoff policy
+                    }
+                }
+            }
+        }
+    }
+}
+
+function filter_policies($policies, $fields) {
+    if (length($fields) > 0) {
+        $policies = array_filter(function ($policy) closure($fields) {
+            $match = true;
+            if (length($policy["fields"]) === length($fields)) {
+                foreach ($fields as $field) {
+                    if (!array_includes($field, $policy["fields"])) {
+                        $match = false;
+                        break;
+                    }
+                }
+            } else {
+                $match = false;
+            }
+            return $match;
+        }, $policies);
+    }
+    return $policies;
 }

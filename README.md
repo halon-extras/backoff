@@ -1,6 +1,6 @@
-# Enable backoff mode
+# Backoff mode
 
-A HSL function for enabling backoff mode on sub-queues using dynamic queue policies.
+HSL functions to enable/disable backoff mode on sub-queues using dynamic queue policies.
 
 ## smtpd-app.yaml
 
@@ -31,6 +31,7 @@ policies:
           backoff-concurrency: 2
           backoff-rate: 10/3600
           backoff-ttl: 3600
+          backoff-disableable: true
     default:
       concurrency: 5
       rate: 10
@@ -38,6 +39,7 @@ policies:
         backoff-concurrency: 1
         backoff-rate: 5/3600
         backoff-ttl: 3600
+        backoff-disableable: false
 ```
 
 ## Post-delivery script
@@ -45,4 +47,7 @@ policies:
 ```
 enable_backoff($arguments, $message); // Enable all matching backoff policies
 enable_backoff($arguments, $message, ["remotemx"]); // Enable only one backoff policy based on it's fields
+
+disable_backoff($arguments, $message); // Disable all matching backoff policies
+disable_backoff($arguments, $message, ["remotemx"]); // Disable only one backoff policy based on it's fields
 ```
