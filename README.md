@@ -45,7 +45,8 @@ policies:
 ## Post-delivery script
 
 ```
-if ($enablebackoff) { // Set this variable based on SMTP response patterns
+// Use SMTP patterns to determine if backoff should be enabled
+if ($arguments["attempt"]["result"]["reason"][0] =~ #/^421 .* too many errors/) {
   enable_backoff($arguments, $message); // Enable all matching backoff policies
   enable_backoff($arguments, $message, ["remotemx"]); // Enable only one backoff policy based on it's fields
 }
