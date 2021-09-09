@@ -45,9 +45,14 @@ policies:
 ## Post-delivery script
 
 ```
-enable_backoff($arguments, $message); // Enable all matching backoff policies
-enable_backoff($arguments, $message, ["remotemx"]); // Enable only one backoff policy based on it's fields
+if ($enablebackoff) { // Set this variable based on SMTP response patterns
+  enable_backoff($arguments, $message); // Enable all matching backoff policies
+  enable_backoff($arguments, $message, ["remotemx"]); // Enable only one backoff policy based on it's fields
+}
 
-disable_backoff($arguments, $message); // Disable all matching backoff policies
-disable_backoff($arguments, $message, ["remotemx"]); // Disable only one backoff policy based on it's fields
+// Disable backoff on successful deliveries
+if (!$arguments["action"]) {
+  disable_backoff($arguments, $message); // Disable all matching backoff policies
+  disable_backoff($arguments, $message, ["remotemx"]); // Disable only one backoff policy based on it's fields
+}
 ```
