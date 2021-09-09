@@ -18,20 +18,20 @@ lists:
 ```
 policies:
   - fields:
-    - remotemx:
-        gsuite:
-          - "@gsuite"
+      - remotemx:
+          gsuite:
+            - "@gsuite"
     conditions:
-    - if:
-        remotemx: "#gsuite"
-      then:
-        concurrency: 10
-        rate: 50
-        properties:
-          backoff-concurrency: 2
-          backoff-rate: 10/3600
-          backoff-ttl: 3600
-          backoff-disableable: true
+      - if:
+          remotemx: "#gsuite"
+        then:
+          concurrency: 10
+          rate: 50
+          properties:
+            backoff-concurrency: 2
+            backoff-rate: 10/3600
+            backoff-ttl: 3600
+            backoff-disableable: true
     default:
       concurrency: 5
       rate: 10
