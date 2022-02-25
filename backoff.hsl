@@ -1,48 +1,51 @@
-function enable_backoff($arguments, $message, $fields = []) {
-    // Filter policies to enable based on optional $fields parameter
-    $policies = filter_policies($arguments["policy"]["policies"], $fields);
+function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
+    $matched = match_patterns($arguments, $patterns);
+    if ($matched) {
+        // Filter policies to enable based on optional $fields parameter
+        $policies = filter_policies($arguments["policy"]["policies"], $fields);
 
-    // Store field values in an easier to use format
-    $values = [
-        "localip" => $arguments["attempt"]["connection"]["localip"],
-        "remoteip" => $arguments["attempt"]["connection"]["remoteip"],
-        "remotemx" => $arguments["attempt"]["connection"]["remotemx"],
-        "recipientdomain" => $message["recipientaddress"]["domain"],
-        "jobid" => $message["jobid"],
-        "transportid" => $message["transportid"]
-    ];
+        // Store field values in an easier to use format
+        $values = [
+            "localip" => $arguments["attempt"]["connection"]["localip"],
+            "remoteip" => $arguments["attempt"]["connection"]["remoteip"],
+            "remotemx" => $arguments["attempt"]["connection"]["remotemx"],
+            "recipientdomain" => $message["recipientaddress"]["domain"],
+            "jobid" => $message["jobid"],
+            "transportid" => $message["transportid"]
+        ];
 
-    // Go through all filtered policies and enable them
-    foreach ($policies as $policy) {
-        // Skip policies that already have backoff enabled
-        if (isset($policy["tags"]) and array_includes("backoff", $policy["tags"])) {
-            continue;
-        }
-
-        // Set all field values in condition
-        $condition = [];
-        foreach ($policy["fields"] as $field) {
-            $condition[$field] = $values[$field];
-        }
-
-        // Get values from properties
-        $backoff = [];
-        $properties = $policy["properties"];
-        if ($properties["backoff-rate"]) {
-            if ($properties["backoff-rate"] =~ #/\//) {
-                $backoff["rate"] = str_split($properties["backoff-rate"], "/");
-            } else {
-                $backoff["rate"] = [$properties["backoff-rate"], 1];
+        // Go through all filtered policies and enable them
+        foreach ($policies as $policy) {
+            // Skip policies that already have backoff enabled
+            if (isset($policy["tags"]) and array_includes("backoff", $policy["tags"])) {
+                continue;
             }
-        }
-        if ($properties["backoff-concurrency"]) {
-            $backoff["concurrency"] = $properties["backoff-concurrency"];
-        }
 
-        // Enable policy if backoff values were found
-        if (length($backoff) > 0 and $properties["backoff-ttl"]) {
-            $backoff["tag"] = "backoff"; // Set backoff tag
-            queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => false]);
+            // Set all field values in condition
+            $condition = [];
+            foreach ($policy["fields"] as $field) {
+                $condition[$field] = $values[$field];
+            }
+
+            // Get values from properties
+            $backoff = [];
+            $properties = $policy["properties"];
+            if ($properties["backoff-rate"]) {
+                if ($properties["backoff-rate"] =~ #/\//) {
+                    $backoff["rate"] = str_split($properties["backoff-rate"], "/");
+                } else {
+                    $backoff["rate"] = [$properties["backoff-rate"], 1];
+                }
+            }
+            if ($properties["backoff-concurrency"]) {
+                $backoff["concurrency"] = $properties["backoff-concurrency"];
+            }
+
+            // Enable policy if backoff values were found
+            if (length($backoff) > 0 and $properties["backoff-ttl"]) {
+                $backoff["tag"] = "backoff"; // Set backoff tag
+                queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => false]);
+            }
         }
     }
 }
@@ -84,4 +87,22 @@ function filter_policies($policies, $fields) {
         }, $policies);
     }
     return $policies;
+}
+
+function match_patterns($arguments, $patterns) {
+    $result = "";
+    if ($arguments["attempt"]["result"]) {
+        $result = $arguments["attempt"]["result"]["code"]." ";
+        if ($arguments["attempt"]["result"]["enhanced"])
+            $result .= array_join($arguments["attempt"]["result"]["enhanced"], ".")." ";
+        $result .= array_join($arguments["attempt"]["result"]["reason"], " ");
+    }
+    if ($result) {
+        foreach ($patterns as $pattern) {
+            if ($result =~ $pattern) {
+                return true;
+            }
+        }
+    }
+    return false;
 }

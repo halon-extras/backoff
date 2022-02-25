@@ -45,14 +45,13 @@ policies:
 ## Post-delivery script
 
 ```
-// Use SMTP patterns to determine if backoff should be enabled
-if ($arguments["attempt"]["result"]["reason"][0] =~ #/^421 .* too many errors/) {
-  enable_backoff($arguments, $message); // Enable all matching backoff policies
-  enable_backoff($arguments, $message, ["remotemx"]); // Enable only one backoff policy based on it's fields
-}
-
-// Disable backoff on successful deliveries
-if (!$arguments["action"]) {
+if ($arguments["action"]) {
+  // Failed deliveries
+  $patterns = [#/421 4\.3\.2 No system resources/]; // Use SMTP patterns to determine if backoff should be enabled
+  enable_backoff($arguments, $message, $patterns); // Enable all matching backoff policies
+  enable_backoff($arguments, $message, $patterns, ["remotemx"]); // Enable only one backoff policy based on it's fields
+} else {
+  // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
   disable_backoff($arguments, $message, ["remotemx"]); // Disable only one backoff policy based on it's fields
 }
