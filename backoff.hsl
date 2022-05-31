@@ -44,7 +44,7 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
             // Enable policy if backoff values were found
             if (length($backoff) > 0 and $properties["backoff-ttl"]) {
                 $backoff["tag"] = "backoff"; // Set backoff tag
-                queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => false]);
+                queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
             }
         }
     }
