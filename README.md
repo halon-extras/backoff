@@ -47,7 +47,10 @@ policies:
 ```
 if ($arguments["action"]) {
   // Failed deliveries
-  $patterns = [#/421 4\.3\.2 No system resources/]; // Use SMTP patterns to determine if backoff should be enabled
+  $patterns = [
+    ["pattern" => #/421 4\.3\.2 No system resources/, "tag" => "system"], // Use SMTP patterns to determine if backoff should be enabled
+    // #/421 4\.3\.2 No system resources/ // The pattern can also be a plain regex or string without the tag property
+  ];
   enable_backoff($arguments, $message, $patterns); // Enable all matching backoff policies
   enable_backoff($arguments, $message, $patterns, ["remotemx"]); // Enable only one backoff policy based on it's fields
 } else {

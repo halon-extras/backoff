@@ -1,6 +1,6 @@
 function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
-    $matched = match_patterns($arguments, $patterns);
-    if ($matched) {
+    $pattern = match_patterns($arguments, $patterns);
+    if ($pattern) {
         // Filter policies to enable based on optional $fields parameter
         $policies = filter_policies($arguments["policy"]["policies"], $fields);
 
@@ -17,7 +17,9 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
         // Go through all filtered policies and enable them
         foreach ($policies as $policy) {
             // Skip policies that already have backoff enabled
-            if (isset($policy["tags"]) and array_includes("backoff", $policy["tags"])) {
+            if (isset($policy["tags"]) and array_includes(function ($tag) {
+                return $tag === "backoff" or $tag =~ #/^backoff-.+$/;
+            }, $policy["tags"])) {
                 continue;
             }
 
@@ -43,7 +45,7 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
 
             // Enable policy if backoff values were found
             if (length($backoff) > 0 and $properties["backoff-ttl"]) {
-                $backoff["tag"] = "backoff"; // Set backoff tag
+                $backoff["tag"] = $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
             }
         }
@@ -60,7 +62,7 @@ function disable_backoff($arguments, $message, $fields = []) {
         if ($disableable === true) {
             if (isset($policy["dynamic"])) {
                 foreach ($policy["dynamic"] as $dynamic) {
-                    if ($dynamic["tag"] === "backoff") {
+                    if ($dynamic["tag"] === "backoff" or $dynamic["tag"] =~ #/^backoff-.+$/) {
                         queue_policy_delete($dynamic["id"]); // Disable backoff policy
                     }
                 }
@@ -99,10 +101,15 @@ function match_patterns($arguments, $patterns) {
     }
     if ($result) {
         foreach ($patterns as $pattern) {
-            if ($result =~ $pattern) {
-                return true;
+            if ($pattern["pattern"]) {
+                if ($result =~ $pattern["pattern"]) {
+                    return $pattern;
+                }
+            } else {
+                if ($result =~ $pattern) {
+                    return $pattern;
+                }
             }
         }
     }
-    return false;
 }
