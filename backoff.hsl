@@ -102,6 +102,8 @@ function match_patterns($arguments, $patterns) {
         if ($arguments["attempt"]["result"]["enhanced"])
             $result .= array_join($arguments["attempt"]["result"]["enhanced"], ".")." ";
         $result .= array_join($arguments["attempt"]["result"]["reason"], " ");
+    } else if ($arguments["attempt"]["error"]["message"]) {
+        $result = $arguments["attempt"]["error"]["message"];
     }
     if ($result) {
         foreach ($patterns as $pattern) {
