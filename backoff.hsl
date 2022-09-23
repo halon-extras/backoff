@@ -116,7 +116,7 @@ function match_patterns($arguments, $patterns) {
                     return $pattern;
                 }
             } else {
-                if ($result =~ $pattern) {
+                if ($pattern and $result =~ $pattern) {
                     return $pattern;
                 }
             }
