@@ -53,7 +53,7 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
 
             // Enable policy if backoff values were found
             if (length($backoff) > 0 and $properties["backoff-ttl"]) {
-                $backoff["tag"] = $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
+                $backoff["tag"] = is_array($pattern) and $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
             }
         }
@@ -111,8 +111,8 @@ function match_patterns($arguments, $patterns) {
     }
     if ($result) {
         foreach ($patterns as $pattern) {
-            if ($pattern["pattern"]) {
-                if ($result =~ $pattern["pattern"]) {
+            if (is_array($pattern)) {
+                if ($pattern["pattern"] and $result =~ $pattern["pattern"]) {
                     return $pattern;
                 }
             } else {
