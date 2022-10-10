@@ -2,7 +2,25 @@
 
 HSL functions to enable/disable backoff mode on sub-queues using dynamic queue policies.
 
-## smtpd-app.yaml
+## Installation
+
+Follow the [instructions](https://docs.halon.io/manual/comp_install.html#installation) in our manual to add our package repository and then run the below command.
+
+### Ubuntu
+
+```
+apt-get install halon-extras-backoff
+```
+
+### RHEL
+
+```
+yum install halon-extras-backoff
+```
+
+## Configuration
+
+### smtpd-app.yaml
 
 ```
 lists:
@@ -13,7 +31,7 @@ lists:
       - '*.smtp.goog'
 ```
 
-## smtpd-policy.yaml
+### smtpd-policy.yaml
 
 ```
 policies:
@@ -42,7 +60,28 @@ policies:
         backoff-disableable: false
 ```
 
-## Post-delivery script
+## Exported functions
+
+These functions needs to be [imported](https://docs.halon.io/hsl/structures.html#import) from the `extras://backoff` module path.
+
+### enable_backoff(arguments, message, patterns [, fields])
+
+**Params**
+
+- arguments `array` - The [$arguments](https://docs.halon.io/hsl/postdelivery.html#v-z1) variable
+- message `array` - The [$message](https://docs.halon.io/hsl/postdelivery.html#v-m1) variable
+- patterns `array` - The patterns
+- fields `array` - The fields (optional)
+
+### disable_backoff(arguments, message, [, fields])
+
+**Params**
+
+- arguments `array` - The [$arguments](https://docs.halon.io/hsl/postdelivery.html#v-z1) variable
+- message `array` - The [$message](https://docs.halon.io/hsl/postdelivery.html#v-m1) variable
+- fields `array` - The fields (optional)
+
+**Example (Post-delivery)**
 
 ```
 if ($arguments["action"]) {
