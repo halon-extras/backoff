@@ -84,6 +84,8 @@ These functions needs to be [imported](https://docs.halon.io/hsl/structures.html
 **Example (Post-delivery)**
 
 ```
+import { enable_backoff, disable_backoff } from "extras://backoff";
+
 if ($arguments["action"]) {
   // Failed deliveries
   $patterns = [
