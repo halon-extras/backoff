@@ -36,6 +36,7 @@ lists:
 ```
 policies:
   - fields:
+      - localip
       - remotemx:
           gsuite:
             - "@gsuite"
@@ -93,10 +94,10 @@ if ($arguments["action"]) {
     // #/421 4\.3\.2 No system resources/ // The pattern can also be a plain regex or string without the tag property
   ];
   enable_backoff($arguments, $message, $patterns); // Enable all matching backoff policies
-  enable_backoff($arguments, $message, $patterns, ["remotemx"]); // Enable only one backoff policy based on it's fields
+  // enable_backoff($arguments, $message, $patterns, ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
 } else {
   // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
-  disable_backoff($arguments, $message, ["remotemx"]); // Disable only one backoff policy based on it's fields
+  // disable_backoff($arguments, $message, ["localip", "remotemx"]); // Disable only one backoff policy based on it's fields
 }
 ```
