@@ -11,7 +11,8 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
             "remotemx" => $arguments["attempt"]["connection"]["remotemx"],
             "recipientdomain" => $message["recipientaddress"]["domain"],
             "jobid" => $message["jobid"],
-            "transportid" => $message["transportid"]
+            "transportid" => $message["transportid"],
+            "grouping" => $arguments["grouping"]
         ];
 
         // Go through all filtered policies and enable them
