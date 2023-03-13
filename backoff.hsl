@@ -27,7 +27,14 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
             // Set all field values in condition
             $condition = [];
             foreach ($policy["fields"] as $field) {
-                $condition[$field] = $values[$field];
+                if ($values[$field] !== none) {
+                    $condition[$field] = $values[$field];
+                }
+            }
+
+            // Skip policy if some values are missing
+            if (length($policy["fields"]) !== length($condition)) {
+                continue;
             }
 
             // Get values from properties
