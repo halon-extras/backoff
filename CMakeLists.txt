@@ -16,10 +16,10 @@ INSTALL(FILES "backoff.hsl" DESTINATION "plugins/hsl/${PROJECT_NAME}")
 INSTALL(FILES "main.hsl" DESTINATION "plugins/hsl/${PROJECT_NAME}")
 
 IF (CPACK_GENERATOR MATCHES "DEB")
-	SET(CPACK_DEBIAN_PACKAGE_DEPENDS "halon (>= 5.10)")
+	SET(CPACK_DEBIAN_PACKAGE_DEPENDS "halon (>= 5.10), halon-extras-queue-relinquish (>= 1.2)")
 ENDIF()
 IF (CPACK_GENERATOR MATCHES "RPM")
-	SET(CPACK_RPM_PACKAGE_REQUIRES "halon >= 5.10")
+	SET(CPACK_RPM_PACKAGE_REQUIRES "halon >= 5.10, halon-extras-queue-relinquish >= 1.2")
 ENDIF()
 
 SET(CPACK_PACKAGE_NAME "halon-extras-${PROJECT_NAME}")

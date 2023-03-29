@@ -1,3 +1,5 @@
+import { queue_relinquish } from "extras://queue-relinquish";
+
 function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
     $pattern = match_patterns($arguments, $patterns);
     if ($pattern) {
@@ -57,6 +59,18 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
             if (isset($properties["backoff-stop"])) {
                 $stop = str_lower($properties["backoff-stop"]) === "true" ? true : false;
                 $backoff["stop"] = $stop;
+            }
+            if (isset($properties["backoff-requeue"])) {
+                $requeue = str_lower($properties["backoff-requeue"]) === "true" ? true : false;
+                if ($requeue) {
+                    $return = ["backoff-requeue" => true];
+                    foreach ($properties as $key => $value) {
+                        if ($key[0:16] === "backoff-requeue-") {
+                            $return[$key] = $value;
+                        }
+                    }
+                    queue_relinquish($condition, number($properties["backoff-ttl"]), ["return" => $return]);
+                }
             }
 
             // Enable policy if backoff values were found
