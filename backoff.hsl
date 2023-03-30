@@ -70,6 +70,7 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
                         }
                     }
                     queue_relinquish($condition, number($properties["backoff-ttl"]), ["return" => $return]);
+                    continue;
                 }
             }
 
