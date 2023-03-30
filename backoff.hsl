@@ -40,26 +40,9 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
             }
 
             // Get values from properties
-            $backoff = [];
             $properties = $policy["properties"];
-            if ($properties["backoff-rate"]) {
-                if ($properties["backoff-rate"] =~ #/\//) {
-                    $backoff["rate"] = str_split($properties["backoff-rate"], "/");
-                } else {
-                    $backoff["rate"] = [$properties["backoff-rate"], 1];
-                }
-            }
-            if ($properties["backoff-concurrency"]) {
-                $backoff["concurrency"] = $properties["backoff-concurrency"];
-            }
 
-            if (isset($policy["stop"])) {
-                $backoff["stop"] = $policy["stop"];
-            }
-            if (isset($properties["backoff-stop"])) {
-                $stop = str_lower($properties["backoff-stop"]) === "true" ? true : false;
-                $backoff["stop"] = $stop;
-            }
+            // Requeue
             if (isset($properties["backoff-requeue"]) and $properties["backoff-ttl"]) {
                 $requeue = str_lower($properties["backoff-requeue"]) === "true" ? true : false;
                 if ($requeue) {
@@ -72,6 +55,26 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
                     queue_relinquish($condition, number($properties["backoff-ttl"]), ["return" => $return]);
                     continue;
                 }
+            }
+
+            // Policy
+            $backoff = [];
+            if ($properties["backoff-rate"]) {
+                if ($properties["backoff-rate"] =~ #/\//) {
+                    $backoff["rate"] = str_split($properties["backoff-rate"], "/");
+                } else {
+                    $backoff["rate"] = [$properties["backoff-rate"], 1];
+                }
+            }
+            if ($properties["backoff-concurrency"]) {
+                $backoff["concurrency"] = $properties["backoff-concurrency"];
+            }
+            if (isset($policy["stop"])) {
+                $backoff["stop"] = $policy["stop"];
+            }
+            if (isset($properties["backoff-stop"])) {
+                $stop = str_lower($properties["backoff-stop"]) === "true" ? true : false;
+                $backoff["stop"] = $stop;
             }
 
             // Enable policy if backoff values were found
