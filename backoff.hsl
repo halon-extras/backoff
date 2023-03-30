@@ -60,7 +60,7 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
                 $stop = str_lower($properties["backoff-stop"]) === "true" ? true : false;
                 $backoff["stop"] = $stop;
             }
-            if (isset($properties["backoff-requeue"])) {
+            if (isset($properties["backoff-requeue"]) and $properties["backoff-ttl"]) {
                 $requeue = str_lower($properties["backoff-requeue"]) === "true" ? true : false;
                 if ($requeue) {
                     $return = ["backoff-requeue" => true];
