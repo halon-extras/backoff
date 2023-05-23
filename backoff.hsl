@@ -1,8 +1,22 @@
+import { bounce_list } from "extras://bounce-list";
 import { queue_relinquish } from "extras://queue-relinquish";
 
-function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
-    $pattern = match_patterns($arguments, $patterns);
-    if ($pattern) {
+function enable_backoff($arguments, $message, $list, $fields = []) {
+    $pattern = none;
+    if (is_array($list)) {
+        $pattern = match_patterns($arguments, $list); // Backward compatibility
+    } else {
+        $match = bounce_list($list, $arguments["dsn"]["diagnosticcode"], $arguments["grouping"], $arguments["attempt"]["result"]["state"]);
+        if ($match) {
+            $pattern = [];
+            foreach (str_split($match, ",") as $setting) {
+                [$key, $value] = str_split($setting, "=");
+                if ($key === "suspend") $value = number($value);
+                $pattern[$key] = $value;
+            }
+        }
+    }
+    if ($pattern !== none) {
         // Filter policies to enable based on optional $fields parameter
         $policies = filter_policies($arguments["policy"]["policies"], $fields);
 
@@ -41,6 +55,13 @@ function enable_backoff($arguments, $message, $patterns = [], $fields = []) {
 
             // Get values from properties
             $properties = $policy["properties"];
+
+            // Suspend
+            $suspendable = isset($properties["backoff-suspendable"]) and str_lower($properties["backoff-suspendable"]) === "true" ? true : false;
+            if ($pattern["suspend"] and $suspendable) {
+                queue_suspend($condition, $pattern["suspend"]);
+                continue;
+            }
 
             // Requeue
             if (isset($properties["backoff-requeue"]) and $properties["backoff-ttl"]) {

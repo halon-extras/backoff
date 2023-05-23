@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
-PROJECT("backoff" VERSION 1.1.0)
+PROJECT("backoff" VERSION 1.2.0)
 
 IF (EXISTS "${CMAKE_CURRENT_BINARY_DIR}/CPACK_GENERATOR.txt")
 	FILE(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/CPACK_GENERATOR.txt CPACK_GENERATOR)
@@ -16,10 +16,10 @@ INSTALL(FILES "backoff.hsl" DESTINATION "plugins/hsl/${PROJECT_NAME}")
 INSTALL(FILES "main.hsl" DESTINATION "plugins/hsl/${PROJECT_NAME}")
 
 IF (CPACK_GENERATOR MATCHES "DEB")
-	SET(CPACK_DEBIAN_PACKAGE_DEPENDS "halon (>= 5.10), halon-extras-queue-relinquish (>= 1.2)")
+	SET(CPACK_DEBIAN_PACKAGE_DEPENDS "halon (>= 5.10), halon-extras-queue-relinquish (>= 1.2), halon-extras-bounce-list (>= 1.0)")
 ENDIF()
 IF (CPACK_GENERATOR MATCHES "RPM")
-	SET(CPACK_RPM_PACKAGE_REQUIRES "halon >= 5.10, halon-extras-queue-relinquish >= 1.2")
+	SET(CPACK_RPM_PACKAGE_REQUIRES "halon >= 5.10, halon-extras-queue-relinquish >= 1.2, halon-extras-bounce-list >= 1.0")
 ENDIF()
 
 SET(CPACK_PACKAGE_NAME "halon-extras-${PROJECT_NAME}")

@@ -65,13 +65,13 @@ policies:
 
 These functions needs to be [imported](https://docs.halon.io/hsl/structures.html#import) from the `extras://backoff` module path.
 
-### enable_backoff(arguments, message, patterns [, fields])
+### enable_backoff(arguments, message, list [, fields])
 
 **Params**
 
 - arguments `array` - The [$arguments](https://docs.halon.io/hsl/postdelivery.html#v-z1) variable
 - message `array` - The [$message](https://docs.halon.io/hsl/postdelivery.html#v-m1) variable
-- patterns `array` - The patterns
+- list `string` - The [bounce list](https://github.com/halon-extras/bounce-list) ID
 - fields `array` - The fields (optional)
 
 ### disable_backoff(arguments, message, [, fields])
@@ -89,12 +89,8 @@ import { enable_backoff, disable_backoff } from "extras://backoff";
 
 if ($arguments["action"]) {
   // Failed deliveries
-  $patterns = [
-    ["pattern" => #/421 4\.3\.2 No system resources/, "tag" => "system"], // Use SMTP patterns to determine if backoff should be enabled
-    // #/421 4\.3\.2 No system resources/ // The pattern can also be a plain regex or string without the tag property
-  ];
-  enable_backoff($arguments, $message, $patterns); // Enable all matching backoff policies
-  // enable_backoff($arguments, $message, $patterns, ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
+  enable_backoff($arguments, $message, "list1"); // Enable all matching backoff policies
+  // enable_backoff($arguments, $message, "list1", ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
 } else {
   // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
