@@ -11,11 +11,12 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
             $pattern = ["pattern" => $result["pattern"]];
             foreach (str_split($result["value"], ",") as $setting) {
                 [$key, $value] = str_split($setting, "=");
+                if (!$key or !$value) continue;
                 if ($key === "suspend") $value = number($value);
                 if ($key === "events") {
-                    [$count, $interval] = str_split($value, "/");
-                    $value = ["count" => number($count) - 1, "interval" => number($interval)];
-                    if (!$value["count"] or !$value["interval"]) continue;
+                    [$count, $interval] = array_map(number, str_split($value, "/"));
+                    if ($count <= 1 or $interval <= 0) continue;
+                    $value = ["count" => $count - 1, "interval" => $interval];
                 }
                 $pattern[$key] = $value;
             }
