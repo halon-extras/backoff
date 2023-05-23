@@ -1,17 +1,22 @@
 import { bounce_list } from "extras://bounce-list";
 import { queue_relinquish } from "extras://queue-relinquish";
 
-function enable_backoff($arguments, $message, $list, $fields = []) {
+function enable_backoff($arguments, $message, $list, $fields = [], $rate = none) {
     $pattern = none;
     if (is_array($list)) {
         $pattern = match_patterns($arguments, $list); // Backward compatibility
     } else {
-        $match = bounce_list($list, $arguments["dsn"]["diagnosticcode"], $arguments["grouping"], $arguments["attempt"]["result"]["state"]);
-        if ($match) {
-            $pattern = [];
-            foreach (str_split($match, ",") as $setting) {
+        $result = bounce_list($list, $arguments["dsn"]["diagnosticcode"], $arguments["grouping"], $arguments["attempt"]["result"]["state"]);
+        if ($result) {
+            $pattern = ["pattern" => $result["pattern"]];
+            foreach (str_split($result["value"], ",") as $setting) {
                 [$key, $value] = str_split($setting, "=");
                 if ($key === "suspend") $value = number($value);
+                if ($key === "events") {
+                    [$count, $interval] = str_split($value, "/");
+                    $value = ["count" => number($count) - 1, "interval" => number($interval)];
+                    if (!$value["count"] or !$value["interval"]) continue;
+                }
                 $pattern[$key] = $value;
             }
         }
@@ -55,6 +60,14 @@ function enable_backoff($arguments, $message, $list, $fields = []) {
 
             // Get values from properties
             $properties = $policy["properties"];
+
+            // Events
+            if ($pattern["events"]) {
+                $entry = json_encode([...$condition, "pattern" => $pattern["pattern"]]);
+                if ($rate("backoff", $entry, $pattern["events"]["count"], $pattern["events"]["interval"]) === true) {
+                    continue;
+                }
+            }
 
             // Suspend
             $suspendable = isset($properties["backoff-suspendable"]) and str_lower($properties["backoff-suspendable"]) === "true" ? true : false;

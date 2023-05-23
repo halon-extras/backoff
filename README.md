@@ -67,7 +67,7 @@ policies:
 
 These functions needs to be [imported](https://docs.halon.io/hsl/structures.html#import) from the `extras://backoff` module path.
 
-### enable_backoff(arguments, message, list [, fields])
+### enable_backoff(arguments, message, list [, fields, [, rate]])
 
 **Params**
 
@@ -75,6 +75,7 @@ These functions needs to be [imported](https://docs.halon.io/hsl/structures.html
 - message `array` - The [$message](https://docs.halon.io/hsl/postdelivery.html#v-m1) variable
 - list `string` - The [bounce list](https://github.com/halon-extras/bounce-list) ID
 - fields `array` - The fields (optional)
+- rate `function` - The rate function
 
 ### disable_backoff(arguments, message, [, fields])
 
