@@ -51,6 +51,7 @@ policies:
             backoff-rate: 10/3600
             backoff-ttl: 3600
             backoff-disableable: true
+            backoff-suspendable: true
     default:
       concurrency: 5
       rate: 10
@@ -59,6 +60,7 @@ policies:
         backoff-rate: 5/3600
         backoff-ttl: 3600
         backoff-disableable: false
+        backoff-suspendable: false
 ```
 
 ## Exported functions
