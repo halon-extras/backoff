@@ -92,9 +92,10 @@ policies:
 ### backoff.csv
 
 ```
-"/^450/","tag=tag1,events=10/60"
-"/^451/","tag=tag2,suspend=3600"
-"/^5\d\d/","tag=tag3"
+"/^450/","tag=tag1",&google,EOD
+"/^452/","tag=tag2,events=10/60"
+"/^451/","tag=tag3,suspend=3600"
+"/^5\d\d/","tag=tag4"
 ```
 
 **Options**
