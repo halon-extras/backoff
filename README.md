@@ -20,15 +20,35 @@ yum install halon-extras-backoff
 
 ## Configuration
 
+### smtpd.yaml
+
+```
+plugins:
+  - id: bounce-list
+    config:
+      lists:
+        - id: backoff
+          path: /etc/halon/backoff.csv
+```
+
 ### smtpd-app.yaml
 
 ```
-lists:
-  remotemx:
-    gsuite:
-      - '*.google.com'
-      - '*.googlemail.com'
-      - '*.smtp.goog'
+queues:
+  grouping:
+    default: recipientdomain
+    groupings:
+      - id: google
+        remotemx:
+          - "*.google.com"
+          - "*.googlemail.com"
+          - "*.smtp.goog"
+      - id: microsoft
+        remotemx:
+          - "*.protection.outlook.com"
+      - id: yahoo
+        remotemx:
+          - "*.yahoodns.net"
 ```
 
 ### smtpd-policy.yaml
@@ -37,15 +57,13 @@ lists:
 policies:
   - fields:
       - localip
-      - remotemx:
-          gsuite:
-            - "@gsuite"
+      - grouping
     conditions:
       - if:
-          remotemx: "#gsuite"
+          remotemx: "&google"
         then:
-          concurrency: 10
-          rate: 50
+          concurrency: 4
+          rate: 120/60
           properties:
             backoff-concurrency: 2
             backoff-rate: 10/3600
@@ -53,8 +71,8 @@ policies:
             backoff-disableable: true
             backoff-suspendable: true
     default:
-      concurrency: 5
-      rate: 10
+      concurrency: 2
+      rate: 30/60
       properties:
         backoff-concurrency: 1
         backoff-rate: 5/3600
@@ -62,6 +80,28 @@ policies:
         backoff-disableable: false
         backoff-suspendable: false
 ```
+
+**Properties**
+
+- backoff-concurrency `number` - The concurrency that should be applied when entering backoff mode for the queue
+- backoff-rate `string` - The rate that should be applied when entering backoff mode for the queue
+- backoff-ttl `number` - How long the backoff should be enabled for the queue
+- backoff-disableable `boolean` - If the backoff should be disabled upon a successful delivery for the queue
+- backoff-suspendable `boolean` - If the queue can be completely suspended by a specific backoff pattern
+
+### backoff.csv
+
+```
+"/^450/","tag=tag1,events=10/60"
+"/^451/","tag=tag2,suspend=3600"
+"/^5\d\d/","tag=tag3"
+```
+
+**Options**
+
+- tag `string` - The tag that should be applied for the dynamic policy / suspend. The max length is `8` characters
+- events `string` - The rate that is needed for the backoff to trigger. If added you need to use a value above 1 event per interval. The default is to trigger immediately
+- suspend `number` - Will suspend the queue completely for that many seconds. The default is to not suspend the queue
 
 ## Exported functions
 
