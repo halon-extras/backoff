@@ -100,7 +100,7 @@ policies:
 
 **Options**
 
-- tag `string` - The tag that should be applied for the dynamic policy / suspend. The max length is `8` characters
+- tag `string` - The tag that should be applied for the dynamic policy / suspend. The max length is `8` in version `5.12` and below of the Halon MTA and `24` in version `6.0` and above
 - events `string` - The rate that is needed for the backoff to trigger. If added you need to use a value above 1 event per interval. The default is to trigger immediately
 - suspend `number` - Will suspend the queue completely for that many seconds. The default is to not suspend the queue
 
