@@ -133,8 +133,8 @@ import { enable_backoff, disable_backoff } from "extras://backoff";
 
 if ($arguments["action"]) {
   // Failed deliveries
-  enable_backoff($arguments, $message, "list1"); // Enable all matching backoff policies
-  // enable_backoff($arguments, $message, "list1", ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
+  enable_backoff($arguments, $message, "backoff"); // Enable all matching backoff policies
+  // enable_backoff($arguments, $message, "backoff", ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
 } else {
   // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
