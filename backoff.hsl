@@ -120,6 +120,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
             }
         }
+        return ["pattern" => $pattern];
     }
 }
 
