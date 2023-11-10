@@ -120,6 +120,10 @@ These functions needs to be [imported](https://docs.halon.io/hsl/structures.html
 - fields `array` - The fields (optional)
 - rate `function` - The rate function
 
+**Returns**
+
+Returns an `array` with an index of `pattern` if there was a matching pattern, otherwise `none`.
+
 ### disable_backoff(arguments, message, [, fields])
 
 **Params**
