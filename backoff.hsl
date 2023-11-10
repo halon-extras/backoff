@@ -24,7 +24,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
     }
     if ($pattern !== none) {
         // Filter policies to enable based on optional $fields parameter
-        $policies = filter_policies($arguments["policy"]["policies"], $fields);
+        $policies = filter_policies($arguments["policy"]["policies"] ?? [], $fields);
 
         // Store field values in an easier to use format
         $values = [
@@ -125,7 +125,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
 
 function disable_backoff($arguments, $message, $fields = []) {
     // Filter policies to disable based on optional $fields parameter
-    $policies = filter_policies($arguments["policy"]["policies"], $fields);
+    $policies = filter_policies($arguments["policy"]["policies"] ?? [], $fields);
     foreach ($policies as $policy) {
         $properties = $policy["properties"];
         $disableable = isset($properties["backoff-disableable"]) and str_lower($properties["backoff-disableable"]) === "true" ? true : false;
