@@ -60,7 +60,7 @@ policies:
       - grouping
     conditions:
       - if:
-          remotemx: "&google"
+          grouping: "&google"
         then:
           concurrency: 4
           rate: 120/60
