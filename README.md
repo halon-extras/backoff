@@ -100,7 +100,9 @@ policies:
 "/^5\d\d/","tag=tag4"
 ```
 
-**Options**
+The format is described in [`halon-extras`](https://github.com/halon-extras/bounce-list?tab=readme-ov-file#bounce-list-format), this describes how to use the Grouping and SMTP state columns to limit the scope of a rule.
+
+**Options, specified in the second column**
 
 - tag `string` - The tag that should be applied for the dynamic policy / suspend. The max length is `8` in version `5.12` and below of the Halon MTA and `24` in version `6.0` and above
 - events `string` - The rate that is needed for the backoff to trigger. If added you need to use a value above 1 event per interval. The default is to trigger immediately
