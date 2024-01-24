@@ -2,6 +2,11 @@ import { bounce_list } from "extras://bounce-list";
 import { queue_relinquish } from "extras://queue-relinquish";
 
 function enable_backoff($arguments, $message, $list, $fields = [], $rate = none) {
+    $response = [];
+
+    // Filter policies to enable based on optional $fields parameter
+    $policies = filter_policies($arguments["policy"]["policies"] ?? [], $fields);
+
     $pattern = none;
     if (is_array($list)) {
         $pattern = match_patterns($arguments, $list); // Backward compatibility
@@ -25,8 +30,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
         }
     }
     if ($pattern !== none) {
-        // Filter policies to enable based on optional $fields parameter
-        $policies = filter_policies($arguments["policy"]["policies"] ?? [], $fields);
+        $response["pattern"] = $pattern;
 
         // Store field values in an easier to use format
         $values = [
@@ -121,9 +125,43 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                 $backoff["tag"] = is_array($pattern) and $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
             }
+
+            // Include backoff settings in response for new dynamic backoff policy
+            $response = append_settings($arguments, $properties, $response);
         }
-        return ["pattern" => $pattern];
     }
+
+    // Include backoff settings in response for already active dynamic backoff policies
+    foreach ($policies as $policy) {
+        $properties = $policy["properties"];
+        if (isset($policy["dynamic"])) {
+            foreach ($policy["dynamic"] as $dynamic) {
+                if ($dynamic["tag"] === "backoff" or $dynamic["tag"] =~ #/^backoff-.+$/) {
+                    $response = append_settings($arguments, $properties, $response);
+                }
+            }
+        }
+    }
+
+    return $response;
+}
+
+function append_settings($arguments, $properties, $response)
+{
+    // Retry
+    if (!isset($response["bounce"]) and !isset($response["delay"])) {
+        $expired = $arguments["expired"];
+        $count = isset($properties["backoff-retry-count"]) ? number($properties["backoff-retry-count"]) : 0;
+        if ($count) {
+            $expired = $arguments["retry"] >= $count;
+            if ($expired) $response["bounce"] = true;
+        } 
+        $intervals = isset($properties["backoff-retry-intervals"]) ? array_filter(function ($interval) { return $interval > 0; }, array_map(number, array_map(str_strip, str_split($properties["backoff-retry-intervals"], ",")))) : [];
+        if ($intervals and !$expired) {
+            $response["delay"] = $intervals[$arguments["retry"]] ?? $intervals[-1:][0];
+        }
+    }
+    return $response;
 }
 
 function disable_backoff($arguments, $message, $fields = []) {

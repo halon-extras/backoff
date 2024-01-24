@@ -70,6 +70,8 @@ policies:
             backoff-ttl: 3600
             backoff-disableable: true
             backoff-suspendable: true
+            # backoff-retry-intervals: 60,900,3600,7200,10800
+            # backoff-retry-count: 30
     default:
       concurrency: 2
       rate: 30/60
@@ -79,6 +81,8 @@ policies:
         backoff-ttl: 3600
         backoff-disableable: false
         backoff-suspendable: false
+        # backoff-retry-intervals: 60,900,3600,7200,10800
+        # backoff-retry-count: 30
 ```
 
 **Properties**
@@ -124,7 +128,7 @@ These functions needs to be [imported](https://docs.halon.io/hsl/structures.html
 
 **Returns**
 
-Returns an `array` with an index of `pattern` if there was a matching pattern, otherwise `none`.
+Returns an `array` with an optional index of `pattern` (`string`) if there was a matching pattern, an optional index of `delay` (`number`) if the message should be queued with a delay instead of bounced and an optional index of `bounce` (`boolean`) if the message should be bounced instead of queued.
 
 ### disable_backoff(arguments, message, [, fields])
 
@@ -141,8 +145,14 @@ import { enable_backoff, disable_backoff } from "extras://backoff";
 
 if ($arguments["action"]) {
   // Failed deliveries
-  enable_backoff($arguments, $message, "backoff"); // Enable all matching backoff policies
-  // enable_backoff($arguments, $message, "backoff", ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
+  $backoff = enable_backoff($arguments, $message, "backoff"); // Enable all matching backoff policies
+  // $backoff = enable_backoff($arguments, $message, "backoff", ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
+  if ($backoff["delay"]) {
+    Queue(["delay" => $backoff["delay"]]);
+  }
+  if ($backoff["bounce"]) {
+    Bounce();
+  }
 } else {
   // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
