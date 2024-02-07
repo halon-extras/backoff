@@ -92,6 +92,8 @@ policies:
 - backoff-ttl `number` - How long the backoff should be enabled for the queue
 - backoff-disableable `boolean` - If the backoff should be disabled upon a successful delivery for the queue
 - backoff-suspendable `boolean` - If the queue can be completely suspended by a specific backoff pattern
+- backoff-retry-intervals `string` - The retry intervals that should be used when entering backoff mode for the queue
+- backoff-retry-count `number` - The retry count that should be used when entering backoff mode for the queue
 - backoff-requeue `boolean` - If the messages in the queue should be requeued instead of entering backoff mode
 - backoff-requeue-* `string` - Custom properties to return when requeueing the messages which can be accessed using `$arguments["queue"]["plugin"]["return"]` in the [Pre-delivery](https://docs.halon.io/hsl/predelivery.html) script
 
