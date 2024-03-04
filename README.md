@@ -148,7 +148,7 @@ import { enable_backoff, disable_backoff } from "extras://backoff";
 if ($arguments["action"]) {
   // Failed deliveries
   $backoff = enable_backoff($arguments, $message, "backoff"); // Enable all matching backoff policies
-  // $backoff = enable_backoff($arguments, $message, "backoff", ["localip", "remotemx"]); // Enable only one backoff policy based on it's fields
+  // $backoff = enable_backoff($arguments, $message, "backoff", ["localip", "grouping"]); // Enable only one backoff policy based on it's fields
   if ($backoff["delay"]) {
     Queue(["delay" => $backoff["delay"]]);
   }
@@ -158,6 +158,6 @@ if ($arguments["action"]) {
 } else {
   // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
-  // disable_backoff($arguments, $message, ["localip", "remotemx"]); // Disable only one backoff policy based on it's fields
+  // disable_backoff($arguments, $message, ["localip", "grouping"]); // Disable only one backoff policy based on it's fields
 }
 ```
