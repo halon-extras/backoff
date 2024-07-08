@@ -123,6 +123,11 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
             // Enable policy if backoff values were found
             if (length($backoff) > 0 and $properties["backoff-ttl"]) {
                 $backoff["tag"] = is_array($pattern) and $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
+                // Set backoff properties
+                $backoff["properties"] = [
+                    "backoff-ts" => time(),
+                    "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
+                ];
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
             }
 
