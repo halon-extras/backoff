@@ -126,6 +126,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                 // Set backoff properties
                 $backoff["properties"] = [
                     "backoff-ts" => time(),
+                    "backoff-pattern" => is_array($pattern) ? $pattern["pattern"] : $pattern,
                     "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
                 ];
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
