@@ -125,6 +125,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                 $backoff["tag"] = is_array($pattern) and $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
                 // Set backoff properties
                 $backoff["properties"] = [
+                    "backoff-transactionid" => $message["id"]["transaction"],
                     "backoff-ts" => time(),
                     "backoff-pattern" => is_array($pattern) ? $pattern["pattern"] : $pattern,
                     "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
