@@ -156,17 +156,19 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
 function append_settings($arguments, $properties, $response)
 {
     // Retry
-    $temporary = (isset($arguments["attempt"]["result"]["code"]) and $arguments["attempt"]["result"]["code"] >= 400 and $arguments["attempt"]["result"]["code"] <= 499) or $arguments["attempt"]["error"]["temporary"];
-    if ($temporary and !isset($response["bounce"]) and !isset($response["delay"])) {
-        $expired = $arguments["expired"];
-        $count = isset($properties["backoff-retry-count"]) ? number($properties["backoff-retry-count"]) : 0;
-        if ($count) {
-            $expired = $arguments["retry"] >= $count;
-            if ($expired) $response["bounce"] = true;
-        } 
-        $intervals = isset($properties["backoff-retry-intervals"]) ? array_filter(function ($interval) { return $interval > 0; }, array_map(number, array_map(str_strip, str_split($properties["backoff-retry-intervals"], ",")))) : [];
-        if ($intervals and !$expired) {
-            $response["delay"] = $intervals[$arguments["retry"]] ?? $intervals[-1:][0];
+    if (isset($properties["backoff-retry-count"]) or isset($properties["backoff-retry-intervals"])) {
+        $temporary = (isset($arguments["attempt"]["result"]["code"]) and $arguments["attempt"]["result"]["code"] >= 400 and $arguments["attempt"]["result"]["code"] <= 499) or $arguments["attempt"]["error"]["temporary"];
+        if ($temporary and !isset($response["bounce"]) and !isset($response["delay"])) {
+            $expired = $arguments["expired"];
+            $count = isset($properties["backoff-retry-count"]) ? number($properties["backoff-retry-count"]) : 0;
+            if ($count) {
+                $expired = $arguments["retry"] >= $count;
+                if ($expired) $response["bounce"] = true;
+            } 
+            $intervals = isset($properties["backoff-retry-intervals"]) ? array_filter(function ($interval) { return $interval > 0; }, array_map(number, array_map(str_strip, str_split($properties["backoff-retry-intervals"], ",")))) : [];
+            if ($intervals and !$expired) {
+                $response["delay"] = $intervals[$arguments["retry"]] ?? $intervals[-1:][0];
+            }
         }
     }
     return $response;
