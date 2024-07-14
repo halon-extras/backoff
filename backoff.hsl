@@ -156,7 +156,8 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
 function append_settings($arguments, $properties, $response)
 {
     // Retry
-    if (!isset($response["bounce"]) and !isset($response["delay"])) {
+    $temporary = (isset($arguments["attempt"]["result"]["code"]) and $arguments["attempt"]["result"]["code"] >= 400 and $arguments["attempt"]["result"]["code"] <= 499) or $arguments["attempt"]["error"]["temporary"];
+    if ($temporary and !isset($response["bounce"]) and !isset($response["delay"])) {
         $expired = $arguments["expired"];
         $count = isset($properties["backoff-retry-count"]) ? number($properties["backoff-retry-count"]) : 0;
         if ($count) {
