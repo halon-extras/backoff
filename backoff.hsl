@@ -165,7 +165,7 @@ function append_settings($arguments, $properties, $response)
                 $expired = $arguments["retry"] >= $count;
                 if ($expired) $response["bounce"] = true;
             } 
-            $intervals = isset($properties["backoff-retry-intervals"]) ? array_filter(function ($interval) { return $interval > 0; }, array_map(number, array_map(str_strip, str_split($properties["backoff-retry-intervals"], ",")))) : [];
+            $intervals = isset($properties["backoff-retry-intervals"]) ? array_filter(function ($interval) { return $interval > 0; }, array_map(strpduration, array_map(str_strip, str_split($properties["backoff-retry-intervals"], ",")))) : [];
             if ($intervals and !$expired) {
                 $response["delay"] = $intervals[$arguments["retry"]] ?? $intervals[-1:][0];
             }
