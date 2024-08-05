@@ -70,7 +70,7 @@ policies:
             backoff-ttl: 3600
             backoff-disableable: true
             backoff-suspendable: true
-            # backoff-retry-intervals: 60,900,3600,7200,10800
+            # backoff-retry-intervals: 60s,15m,1h,2h,3h
             # backoff-retry-count: 30
     default:
       concurrency: 2
@@ -81,7 +81,7 @@ policies:
         backoff-ttl: 3600
         backoff-disableable: false
         backoff-suspendable: false
-        # backoff-retry-intervals: 60,900,3600,7200,10800
+        # backoff-retry-intervals: 60s,15m,1h,2h,3h
         # backoff-retry-count: 30
 ```
 
