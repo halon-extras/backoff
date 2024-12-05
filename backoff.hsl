@@ -40,7 +40,8 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
             "recipientdomain" => $message["recipientaddress"]["domain"],
             "jobid" => $message["jobid"],
             "transportid" => $message["transportid"],
-            "grouping" => $arguments["grouping"]
+            "grouping" => $arguments["grouping"],
+            "tenantid" => $message["tenantid"]
         ];
 
         // Go through all filtered policies and enable them
