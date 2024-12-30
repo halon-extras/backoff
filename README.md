@@ -96,6 +96,7 @@ policies:
 - backoff-retry-count `number` - The retry count that should be used when entering backoff mode for the queue
 - backoff-requeue `boolean` - If the messages in the queue should be requeued instead of entering backoff mode
 - backoff-requeue-* `string` - Custom properties to return when requeueing the messages which can be accessed using `$arguments["queue"]["plugin"]["return"]` in the [Pre-delivery](https://docs.halon.io/hsl/predelivery.html) script
+- backoff-cluster `boolean` - If clustering should be enabled for the queue policy. The default is `true`
 
 ### backoff.csv
 

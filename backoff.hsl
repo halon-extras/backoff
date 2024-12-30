@@ -120,6 +120,10 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                 $stop = str_lower($properties["backoff-stop"]) === "true" ? true : false;
                 $backoff["stop"] = $stop;
             }
+            if (isset($properties["backoff-cluster"])) {
+                $cluster = str_lower($properties["backoff-cluster"]) === "false" ? false : true;
+                $backoff["cluster"] = $cluster;
+            }
 
             // Enable policy if backoff values were found
             if (length($backoff) > 0 and $properties["backoff-ttl"]) {
