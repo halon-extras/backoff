@@ -113,6 +113,9 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
             if ($properties["backoff-concurrency"]) {
                 $backoff["concurrency"] = $properties["backoff-concurrency"];
             }
+            if ($properties["backoff-connectinterval"]) {
+                $backoff["connectinterval"] = $properties["backoff-connectinterval"];
+            }
             if (isset($policy["stop"])) {
                 $backoff["stop"] = $policy["stop"];
             }

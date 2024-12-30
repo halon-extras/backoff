@@ -89,6 +89,7 @@ policies:
 
 - backoff-concurrency `number` - The concurrency that should be applied when entering backoff mode for the queue
 - backoff-rate `string` - The rate that should be applied when entering backoff mode for the queue
+- backoff-connectinterval `number` - The connect inerval that should be applied when entering backoff mode for the queue
 - backoff-ttl `number` - How long the backoff should be enabled for the queue
 - backoff-disableable `boolean` - If the backoff should be disabled upon a successful delivery for the queue
 - backoff-suspendable `boolean` - If the queue can be completely suspended by a specific backoff pattern
