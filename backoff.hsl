@@ -139,7 +139,10 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                     "backoff-pattern" => is_array($pattern) ? $pattern["pattern"] : $pattern,
                     "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
                 ];
-                queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], ["update" => true]);
+                queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], [
+                    "id" => uuidv5("0bd55de1-74de-433c-a7d3-fcfee2ecd839", json_encode($condition)),
+                    "update" => true
+                ]);
             }
 
             // Include backoff settings in response for new dynamic backoff policy
