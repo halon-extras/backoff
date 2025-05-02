@@ -82,6 +82,13 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
             if ($pattern["suspend"] and $suspendable) {
                 $options = [];
                 if ($pattern["tag"]) $options["tag"] = $pattern["tag"];
+                $options["properties"] = [
+                    ...$properties,
+                    "backoff-transactionid" => $message["id"]["transaction"],
+                    "backoff-ts" => time(),
+                    "backoff-pattern" => is_array($pattern) ? $pattern["pattern"] : $pattern,
+                    "backoff-diagnosticcode" => $arguments["dsn"]["diagnosticcode"]
+                ];
                 queue_suspend($condition, $pattern["suspend"], $options);
                 continue;
             }
