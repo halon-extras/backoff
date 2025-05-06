@@ -81,7 +81,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
             $suspendable = isset($properties["backoff-suspendable"]) and str_lower($properties["backoff-suspendable"]) === "true" ? true : false;
             if ($pattern["suspend"] and $suspendable) {
                 $options = [];
-                if ($pattern["tag"]) $options["tag"] = $pattern["tag"];
+                $options["tag"] = is_array($pattern) and $pattern["tag"] ? "backoff-".$pattern["tag"] : "backoff"; // Set backoff tag
                 $options["properties"] = [
                     ...$properties,
                     "backoff-transactionid" => $message["id"]["transaction"],
