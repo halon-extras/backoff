@@ -148,6 +148,7 @@ function enable_backoff($arguments, $message, $list, $fields = [], $rate = none)
                 ];
                 queue_policy($policy["fields"], $condition, $backoff, $properties["backoff-ttl"], [
                     "id" => uuidv5("0bd55de1-74de-433c-a7d3-fcfee2ecd839", json_encode($condition)),
+                    "type" => "backoff",
                     "update" => true
                 ]);
             }
