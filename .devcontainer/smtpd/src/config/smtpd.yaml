@@ -4,6 +4,12 @@ servers:
     listeners:
       - port: 25
         address: 127.0.0.1
+plugins:
+  - id: bounce-list
+    config:
+      lists:
+       - id: backoff-classifications
+         path: /opt/halon/plugins/data/backoff-classifications/classifications.csv
 environment:
   controlsocket:
     chmod: '0660'

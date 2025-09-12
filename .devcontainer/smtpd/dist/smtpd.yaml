@@ -16,3 +16,9 @@ servers:
   - address: 127.0.0.1
     port: 25
 version: '6.1'
+plugins:
+  - id: bounce-list
+    config:
+      lists:
+       - id: backoff-classifications
+         path: /opt/halon/plugins/data/backoff-classifications/classifications.csv
