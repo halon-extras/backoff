@@ -97,6 +97,7 @@ policies:
 - backoff-retry-count `number` - The retry count that should be used when entering backoff mode for the queue
 - backoff-requeue `boolean` - If the messages in the queue should be requeued instead of entering backoff mode
 - backoff-requeue-* `string` - Custom properties to return when requeueing the messages which can be accessed using `$arguments["queue"]["plugin"]["return"]` in the [Pre-delivery](https://docs.halon.io/hsl/predelivery.html) script
+  - See [here](#requeue-example-pre-delivery) for an example
 - backoff-cluster `boolean` - If clustering should be enabled for the queue policy. The default is `true`
 
 ### backoff.csv
@@ -142,7 +143,9 @@ Returns an `array` with an optional index of `pattern` (`string`) if there was a
 - message `array` - The [$message](https://docs.halon.io/hsl/postdelivery.html#v-m1) variable
 - fields `array` - The fields (optional)
 
-**Example (Post-delivery)**
+## Examples
+
+### Example (Post-delivery)
 
 ```
 import { enable_backoff, disable_backoff } from "extras://backoff";
@@ -161,5 +164,18 @@ if ($arguments["action"]) {
   // Successful deliveries
   disable_backoff($arguments, $message); // Disable all matching backoff policies
   // disable_backoff($arguments, $message, ["localip", "grouping"]); // Disable only one backoff policy based on it's fields
+}
+```
+
+### Requeue example (Pre-delivery)
+
+```
+// Backoff
+$return = $arguments["queue"]["plugin"]["return"];
+if ($return["backoff-requeue"]) {
+    memory_inc("requeue-$jobid");
+    if ($return["backoff-requeue-jobid"]) {
+        $jobid = $options["jobid"] = $return["backoff-requeue-jobid"];
+    }
 }
 ```
